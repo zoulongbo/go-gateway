@@ -5,8 +5,8 @@
 *.so
 *.dylib
 .idea/*
-.idea
-logs
+.idea/
+logs/
 logs/*
 config/dev/*
 
