@@ -6,6 +6,10 @@
 *.dylib
 .idea/*
 .idea
+logs
+logs/*
+config/dev/*
+
 # Test binary, built with `go test -c`
 *.test
 
