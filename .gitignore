@@ -9,6 +9,10 @@
 logs/
 logs/*
 config/dev/*
+cert_file/*.crt
+cert_file/*.key
+cert_file/*.srl
+cert_file/*.csr
 
 # Test binary, built with `go test -c`
 *.test
