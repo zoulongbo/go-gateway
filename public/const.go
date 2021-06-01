@@ -12,6 +12,10 @@ const (
 	HTTPRuleTypePrefixURL = 0
 	HTTPRuleTypeDomain    = 1
 
+	HTTPRuleNeedHttps = 1
+
+	HTTPAccessControlAuth = 1
+
 	IsDeleteTrue  = 1
 	IsDeleteFalse = 0
 
