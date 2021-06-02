@@ -58,7 +58,7 @@ func HttpJwtAuthMiddleware() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
-			c.Set("appDetail", app)
+			c.Set("app", app)
 		}
 		c.Next()
 	}

@@ -22,7 +22,6 @@ func HttpFlowCountMiddleware() gin.HandlerFunc {
 		//3、 租户统计
 		totalCounter,err := public.FlowCountHandler.GetFlowCounter(public.FlowTotal)
 		serviceCounter,err := public.FlowCountHandler.GetFlowCounter(public.FlowServicePrefix+serviceDetail.Info.ServiceName)
-		appCounter,err := public.FlowCountHandler.GetFlowCounter(public.FlowAppPrefix+serviceDetail.Info.ServiceName)
 		if err != nil {
 			middleware.ResponseError(c, 40002, err)
 			c.Abort()
@@ -30,7 +29,6 @@ func HttpFlowCountMiddleware() gin.HandlerFunc {
 		}
 		totalCounter.Increase()
 		serviceCounter.Increase()
-		appCounter.Increase()
 		c.Next()
 	}
 }
