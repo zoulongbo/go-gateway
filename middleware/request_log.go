@@ -54,8 +54,11 @@ func RequestOutLog(c *gin.Context) {
 
 func RequestLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		RequestInLog(c)
-		defer RequestOutLog(c)
+		//todo 日志中间件 检测下是否开启
+		if lib.GetBoolConf("base.log.file_writer.on") {
+			RequestInLog(c)
+			defer RequestOutLog(c)
+		}
 		c.Next()
 	}
 }
