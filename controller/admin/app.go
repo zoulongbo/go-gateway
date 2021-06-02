@@ -8,7 +8,6 @@ import (
 	"github.com/zoulongbo/go-gateway/dto/admin"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
-	"math/rand"
 	"time"
 )
 
@@ -247,12 +246,22 @@ func (app *AppController) AppStat(c *gin.Context) {
 	}
 	//今日流量全天小时级访问统计
 	var todayStat, yesterdayStat []int64
-	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < time.Now().Hour(); i++ {
-		todayStat = append(todayStat, rand.Int63n(100))
+	counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowAppPrefix+detail.AppId)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
 	}
-	for i := 0; i < 23; i++ {
-		yesterdayStat = append(yesterdayStat, rand.Int63n(100))
+	curr := time.Now()
+	for i := 0; i <= curr.Hour(); i++ {
+		currTime := time.Date(curr.Year(), curr.Month(), curr.Day(), i, 0, 0, 0 , lib.TimeLocation)
+		count, _ := counter.GetHourData(currTime)
+		todayStat = append(todayStat, count)
+	}
+	yes := curr.Add(-1 * 24 * time.Hour)
+	for i := 0; i <= 23; i++ {
+		yesTime := time.Date(yes.Year(), yes.Month(), yes.Day(), i, 0, 0, 0 , lib.TimeLocation)
+		count, _ := counter.GetHourData(yesTime)
+		yesterdayStat = append(yesterdayStat, count)
 	}
 	middleware.ResponseSuccess(c, &admin.AppStatOutput{
 		Today:     todayStat,

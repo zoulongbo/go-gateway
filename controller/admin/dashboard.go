@@ -8,12 +8,10 @@ import (
 	"github.com/zoulongbo/go-gateway/dto/admin"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
-	"math/rand"
 	"time"
 )
 
 type DashboardController struct {
-
 }
 
 func RegisterDashboardController(g *gin.RouterGroup) {
@@ -32,7 +30,7 @@ func RegisterDashboardController(g *gin.RouterGroup) {
 // @Produce  json
 // @Success 200 {object} middleware.Response{data=admin.PanelGroupDataOutput} "success"
 // @Router /dashboard/panel_group_data [get]
-func (d *DashboardController) PanelGroupData (c *gin.Context)  {
+func (d *DashboardController) PanelGroupData(c *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)
@@ -50,10 +48,17 @@ func (d *DashboardController) PanelGroupData (c *gin.Context)  {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
+	counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowTotal)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
 
 	out := &admin.PanelGroupDataOutput{
 		ServiceNum:      serviceNum,
 		AppNum:          appNum,
+		CurrentQPS:      counter.QPS,
+		TodayRequestNum: counter.TotalCount,
 	}
 	middleware.ResponseSuccess(c, out)
 }
@@ -67,15 +72,25 @@ func (d *DashboardController) PanelGroupData (c *gin.Context)  {
 // @Produce  json
 // @Success 200 {object} middleware.Response{data=admin.ServiceStatOutput} "success"
 // @Router /dashboard/flow_stat [get]
-func (d *DashboardController) FlowStat (c *gin.Context)  {
+func (d *DashboardController) FlowStat(c *gin.Context) {
 	//今日流量全天小时级访问统计
 	var todayList, yesterdayList []int64
-	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < time.Now().Hour(); i++ {
-		todayList = append(todayList, rand.Int63n(100))
+	counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowTotal)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
 	}
-	for i := 0; i < 23; i++ {
-		yesterdayList = append(yesterdayList, rand.Int63n(100))
+	curr := time.Now()
+	for i := 0; i <= curr.Hour(); i++ {
+		currTime := time.Date(curr.Year(), curr.Month(), curr.Day(), i, 0, 0, 0, lib.TimeLocation)
+		count, _ := counter.GetHourData(currTime)
+		todayList = append(todayList, count)
+	}
+	yes := curr.Add(-1 * 24 * time.Hour)
+	for i := 0; i <= 23; i++ {
+		yesTime := time.Date(yes.Year(), yes.Month(), yes.Day(), i, 0, 0, 0, lib.TimeLocation)
+		count, _ := counter.GetHourData(yesTime)
+		yesterdayList = append(yesterdayList, count)
 	}
 	middleware.ResponseSuccess(c, &admin.ServiceStatOutput{
 		Today:     todayList,
@@ -92,7 +107,7 @@ func (d *DashboardController) FlowStat (c *gin.Context)  {
 // @Produce  json
 // @Success 200 {object} middleware.Response{data=admin.DashServiceStatOutput} "success"
 // @Router /dashboard/service_stat [get]
-func (d *DashboardController) ServiceStat (c *gin.Context)  {
+func (d *DashboardController) ServiceStat(c *gin.Context) {
 	tx, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)

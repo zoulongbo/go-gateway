@@ -9,7 +9,6 @@ import (
 	"github.com/zoulongbo/go-gateway/dto/admin"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
-	"math/rand"
 	"strconv"
 	"strings"
 	"time"
@@ -99,14 +98,19 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 			serviceAddr = fmt.Sprintf("%s:%d", clusterIp, serviceDetail.GRPCRule.Port)
 		}
 		ipList := serviceDetail.LoadBalance.GetIpListByModel()
+		counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowServicePrefix+listItem.ServiceName)
+		if err != nil {
+			middleware.ResponseError(c, 2004, err)
+			return
+		}
 		outItem := admin.ServiceListItemOutput{
 			Id:          listItem.Id,
 			ServiceName: listItem.ServiceName,
 			ServiceDesc: listItem.ServiceDesc,
 			LoadType:    listItem.LoadType,
 			ServiceAddr: serviceAddr,
-			Qps:         0,
-			Qpd:         0,
+			Qps:         counter.QPS,
+			Qpd:         counter.TotalCount,
 			TotalNode:   len(ipList),
 		}
 		outList = append(outList, outItem)
@@ -409,12 +413,22 @@ func (s *ServiceController) ServiceStat(c *gin.Context) {
 	}
 
 	var todayList, yesterdayList []int64
-	rand.Seed(time.Now().UnixNano())
-	for i := 0; i < time.Now().Hour(); i++ {
-		todayList = append(todayList, rand.Int63n(100))
+	counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowServicePrefix+serviceInfo.ServiceName)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
 	}
-	for i := 0; i < 23; i++ {
-		yesterdayList = append(yesterdayList, rand.Int63n(100))
+	curr := time.Now()
+	for i := 0; i <= curr.Hour(); i++ {
+		currTime := time.Date(curr.Year(), curr.Month(), curr.Day(), i, 0, 0, 0 , lib.TimeLocation)
+		count, _ := counter.GetHourData(currTime)
+		todayList = append(todayList, count)
+	}
+	yes := curr.Add(-1 * 24 * time.Hour)
+	for i := 0; i <= 23; i++ {
+		yesTime := time.Date(yes.Year(), yes.Month(), yes.Day(), i, 0, 0, 0 , lib.TimeLocation)
+		count, _ := counter.GetHourData(yesTime)
+		yesterdayList = append(yesterdayList, count)
 	}
 	middleware.ResponseSuccess(c, &admin.ServiceStatOutput{
 		Today:     todayList,
