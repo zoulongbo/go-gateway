@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
@@ -36,7 +35,6 @@ func RegisterOAuthController(group *gin.RouterGroup) {
 func (oauth *OAuthController) Tokens(c *gin.Context) {
 	params := &dto.OAuthInput{}
 	err := params.BindValidParam(c)
-	fmt.Println(params)
 	if err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return

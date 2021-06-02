@@ -17,12 +17,25 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		})
 	})
 
+	//
+	oauth := router.Group("/oauth")
+	oauth.Use(
+		middleware.RecoveryMiddleware(),
+		middleware.RequestLog(),
+		middleware.TranslationMiddleware(),
+	)
+	{
+		controller.RegisterOAuthController(oauth)
+	}
+
 	//根
-	root := router.Group("/")
-	root.Use(
+	router.Use(
 		http_proxy_middleware.HttpAccessModeMiddleware(),
 		http_proxy_middleware.HttpFlowCountMiddleware(),
 		http_proxy_middleware.HttpFlowLimitMiddleware(),
+
+		http_proxy_middleware.HttpJwtAuthMiddleware(),
+
 		http_proxy_middleware.HttpBlackListMiddleware(),
 		http_proxy_middleware.HttpWhiteListMiddleware(),
 		http_proxy_middleware.HttpHeaderTransferMiddleware(),
@@ -31,15 +44,5 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		http_proxy_middleware.HttpReverseProxyMiddleware(),
 		)
 
-	//
-	oauth := router.Group("/oauth")
-	oauth.Use(
-		middleware.RecoveryMiddleware(),
-		middleware.RequestLog(),
-		middleware.TranslationMiddleware(),
-		)
-	{
-		controller.RegisterOAuthController(oauth)
-	}
 	return router
 }
