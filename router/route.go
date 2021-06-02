@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"github.com/zoulongbo/go-gateway/controller/admin"
+	"github.com/zoulongbo/go-gateway/controller"
 	"github.com/zoulongbo/go-gateway/docs"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"log"
@@ -87,7 +87,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.RequestLog(),
 		middleware.TranslationMiddleware())
 	{
-		admin.RegisterLoginController(adminRoute)
+		controller.RegisterLoginController(adminRoute)
 	}
 
 	adminRoute1 := router.Group("/admin")
@@ -98,8 +98,8 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware())
 	{
-		admin.RegisterInfoController(adminRoute1)
-		admin.RegisterServiceController(adminRoute1)
+		controller.RegisterInfoController(adminRoute1)
+		controller.RegisterServiceController(adminRoute1)
 	}
 
 
@@ -111,7 +111,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware())
 	{
-		admin.RegisterAppController(appRoute)
+		controller.RegisterAppController(appRoute)
 	}
 
 	dashRoute := router.Group("/dashboard")
@@ -122,7 +122,7 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		middleware.SessionAuthMiddleware(),
 		middleware.TranslationMiddleware())
 	{
-		admin.RegisterDashboardController(dashRoute)
+		controller.RegisterDashboardController(dashRoute)
 	}
 
 	return router
