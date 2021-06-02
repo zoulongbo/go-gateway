@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/zoulongbo/go-gateway/dao"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
 )
@@ -28,17 +28,17 @@ func RegisterInfoController(group *gin.RouterGroup) {
 //@ID /admin/info
 //@Accept json
 //@Produce json
-//@Success 200 {object} middleware.Response{data=admin.InfoOutput} "success"
+//@Success 200 {object} middleware.Response{data=dto.InfoOutput} "success"
 //@Router /admin/info [get]
 func (i *InfoController) Info(c *gin.Context) {
 	sess := sessions.Default(c)
 	sessionInfo := sess.Get(public.AdminLoginSessionKey)
-	adminSessionInfo := &admin.LoginSessionInfo{}
+	adminSessionInfo := &dto.LoginSessionInfo{}
 	err := json.Unmarshal([]byte(fmt.Sprint(sessionInfo)), adminSessionInfo)
 	if err != nil {
 		middleware.ResponseError(c, 2000, err)
 	}
-	out := admin.InfoOutput{
+	out := dto.InfoOutput{
 		Id:           adminSessionInfo.Id,
 		Name:         adminSessionInfo.Username,
 		LoginTime:    adminSessionInfo.LoginTime,
@@ -56,11 +56,11 @@ func (i *InfoController) Info(c *gin.Context) {
 //@ID /admin/change_pwd
 //@Accept json
 //@Produce json
-//@Param body body admin.ChangePwdInput true "body"
+//@Param body body dto.ChangePwdInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/change_pwd [post]
 func (i *InfoController) ChangePwd(c *gin.Context) {
-	params := &admin.ChangePwdInput{}
+	params := &dto.ChangePwdInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
 		middleware.ResponseError(c, 2000, err)
@@ -68,7 +68,7 @@ func (i *InfoController) ChangePwd(c *gin.Context) {
 	}
 	sess := sessions.Default(c)
 	sessionInfo := sess.Get(public.AdminLoginSessionKey)
-	adminSessionInfo := &admin.LoginSessionInfo{}
+	adminSessionInfo := &dto.LoginSessionInfo{}
 	err = json.Unmarshal([]byte(fmt.Sprint(sessionInfo)), adminSessionInfo)
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)

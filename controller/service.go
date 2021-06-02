@@ -6,7 +6,7 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/zoulongbo/go-gateway/dao"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
 	"strconv"
@@ -40,11 +40,11 @@ func RegisterServiceController(g *gin.RouterGroup) {
 //@ID /admin/service_list
 //@Accept json
 //@Produce json
-//@Param query query admin.ServiceListInput true "body"
-//@Success 200 {object} middleware.Response{data=admin.ServiceListOutput} "success"
+//@Param query query dto.ServiceListInput true "body"
+//@Success 200 {object} middleware.Response{data=dto.ServiceListOutput} "success"
 //@Router /admin/service_list [get]
 func (s *ServiceController) ServiceList(c *gin.Context) {
-	params := &admin.ServiceListInput{}
+	params := &dto.ServiceListInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return
@@ -60,12 +60,12 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
-	out := &admin.ServiceListOutput{
+	out := &dto.ServiceListOutput{
 		Total:    total,
 		PageNo:   params.PageNo,
 		PageSize: params.PageSize,
 	}
-	var outList []admin.ServiceListItemOutput
+	var outList []dto.ServiceListItemOutput
 	for _, listItem := range list {
 		serviceDetail, err := listItem.ServiceDetail(c, tx, &listItem)
 		if err != nil {
@@ -103,7 +103,7 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 			middleware.ResponseError(c, 2004, err)
 			return
 		}
-		outItem := admin.ServiceListItemOutput{
+		outItem := dto.ServiceListItemOutput{
 			Id:          listItem.Id,
 			ServiceName: listItem.ServiceName,
 			ServiceDesc: listItem.ServiceDesc,
@@ -130,7 +130,7 @@ func (s *ServiceController) ServiceList(c *gin.Context) {
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_delete [get]
 func (s *ServiceController) ServiceDelete(c *gin.Context) {
-	params := &admin.ServiceDeleteInput{}
+	params := &dto.ServiceDeleteInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return
@@ -161,11 +161,11 @@ func (s *ServiceController) ServiceDelete(c *gin.Context) {
 //@ID /admin/service_add_http
 //@Accept json
 //@Produce json
-//@Param body body admin.ServiceAddHttpInput true "body"
+//@Param body body dto.ServiceAddHttpInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_add_http [post]
 func (s *ServiceController) ServiceAddHttp(c *gin.Context) {
-	params := &admin.ServiceAddHttpInput{}
+	params := &dto.ServiceAddHttpInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return
@@ -258,11 +258,11 @@ func (s *ServiceController) ServiceAddHttp(c *gin.Context) {
 //@ID /admin/service_update_http
 //@Accept json
 //@Produce json
-//@Param body body admin.ServiceUpdateHttpInput true "body"
+//@Param body body dto.ServiceUpdateHttpInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_update_http [post]
 func (s *ServiceController) ServiceUpdateHttp(c *gin.Context) {
-	params := &admin.ServiceUpdateHttpInput{}
+	params := &dto.ServiceUpdateHttpInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return
@@ -391,7 +391,7 @@ func (s *ServiceController) ServiceDetail(c *gin.Context) {
 //@Accept json
 //@Produce json
 //@Param id query  string true "服务id" default(62)
-//@Success 200 {object} admin.ServiceStatOutput "success"
+//@Success 200 {object} dto.ServiceStatOutput "success"
 //@Router /admin/service_stat [get]
 func (s *ServiceController) ServiceStat(c *gin.Context) {
 	idStr := c.Query("id")
@@ -430,7 +430,7 @@ func (s *ServiceController) ServiceStat(c *gin.Context) {
 		count, _ := counter.GetHourData(yesTime)
 		yesterdayList = append(yesterdayList, count)
 	}
-	middleware.ResponseSuccess(c, &admin.ServiceStatOutput{
+	middleware.ResponseSuccess(c, &dto.ServiceStatOutput{
 		Today:     todayList,
 		Yesterday: yesterdayList,
 	})
@@ -443,11 +443,11 @@ func (s *ServiceController) ServiceStat(c *gin.Context) {
 //@ID /admin/service_add_tcp
 //@Accept json
 //@Produce json
-//@Param body body admin.ServiceAddTcpInput true "body"
+//@Param body body dto.ServiceAddTcpInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_add_tcp [post]
 func (s *ServiceController) ServiceAddTcp(c *gin.Context) {
-	params := &admin.ServiceAddTcpInput{}
+	params := &dto.ServiceAddTcpInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -545,11 +545,11 @@ func (s *ServiceController) ServiceAddTcp(c *gin.Context) {
 //@ID /admin/service_update_tcp
 //@Accept json
 //@Produce json
-//@Param body body admin.ServiceUpdateTcpInput true "body"
+//@Param body body dto.ServiceUpdateTcpInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_update_tcp [post]
 func (s *ServiceController) ServiceUpdateTcp(c *gin.Context) {
-	params := &admin.ServiceUpdateTcpInput{}
+	params := &dto.ServiceUpdateTcpInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -635,11 +635,11 @@ func (s *ServiceController) ServiceUpdateTcp(c *gin.Context) {
 //@ID /admin/service_add_grpc
 //@Accept json
 //@Produce json
-//@Param body body admin.ServiceAddGRPCInput true "body"
+//@Param body body dto.ServiceAddGRPCInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_add_grpc [post]
 func (s *ServiceController) ServiceAddGRPC(c *gin.Context) {
-	params := &admin.ServiceAddGRPCInput{}
+	params := &dto.ServiceAddGRPCInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -739,11 +739,11 @@ func (s *ServiceController) ServiceAddGRPC(c *gin.Context) {
 //@ID /admin/service_update_grpc
 //@Accept json
 //@Produce json
-//@Param body body admin.ServiceUpdateGRPCInput true "body"
+//@Param body body dto.ServiceUpdateGRPCInput true "body"
 //@Success 200 {object} middleware.Response{data=string} "success"
 //@Router /admin/service_update_grpc [post]
 func (s *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
-	params := &admin.ServiceUpdateGRPCInput{}
+	params := &dto.ServiceUpdateGRPCInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return

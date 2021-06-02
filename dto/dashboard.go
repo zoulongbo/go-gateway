@@ -1,4 +1,4 @@
-package admin
+package dto
 
 type PanelGroupDataOutput struct {
 	ServiceNum      int64 `json:"service_num"`

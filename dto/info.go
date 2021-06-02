@@ -1,4 +1,4 @@
-package admin
+package dto
 
 import (
 	"github.com/gin-gonic/gin"

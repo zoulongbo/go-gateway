@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/public"
 	"net/http/httptest"
 	"strings"
@@ -83,7 +83,7 @@ func (sm *ServiceManager) LoadOnce() error  {
 			return
 		}
 		serviceInfo := &ServiceInfo{}
-		params := &admin.ServiceListInput{PageNo:1, PageSize:999999}
+		params := &dto.ServiceListInput{PageNo: 1, PageSize:999999}
 		list, _, err := serviceInfo.PageList(c, tx, params)
 		if err != nil {
 			sm.err = err

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/zoulongbo/go-gateway/dao"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
 	"time"
@@ -28,11 +28,11 @@ func RegisterLoginController(group *gin.RouterGroup) {
 //@ID /admin/login
 //@Accept json
 //@Produce json
-//@Param body body admin.LoginInput true "body"
-//@Success 200 {object} middleware.Response{data=admin.LoginOutput} "success"
+//@Param body body dto.LoginInput true "body"
+//@Success 200 {object} middleware.Response{data=dto.LoginOutput} "success"
 //@Router /admin/login [post]
 func (login *LoginController) Login(c *gin.Context) {
-	params := &admin.LoginInput{}
+	params := &dto.LoginInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
 		middleware.ResponseError(c, 2000, err)
@@ -52,7 +52,7 @@ func (login *LoginController) Login(c *gin.Context) {
 	}
 	//session
 	sess := sessions.Default(c)
-	sessionInfo := &admin.LoginSessionInfo{
+	sessionInfo := &dto.LoginSessionInfo{
 		Id:        adminInfo.Id,
 		Username:  adminInfo.Username,
 		LoginTime: time.Now(),
@@ -65,7 +65,7 @@ func (login *LoginController) Login(c *gin.Context) {
 	sess.Set(public.AdminLoginSessionKey, string(sessionBts))
 	sess.Save()
 
-	out := &admin.LoginOutput{Token: adminInfo.Username}
+	out := &dto.LoginOutput{Token: adminInfo.Username}
 	middleware.ResponseSuccess(c, out)
 }
 

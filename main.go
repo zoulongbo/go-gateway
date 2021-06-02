@@ -38,6 +38,8 @@ func main() {
 
 		//服务数据初始化
 		dao.ServiceManagerHandle.LoadOnce()
+		//租户数据初始化
+		dao.AppHandler.LoadOne()
 
 		//http代理服务
 		go func() {

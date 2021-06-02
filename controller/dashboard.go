@@ -5,7 +5,7 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/zoulongbo/go-gateway/dao"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
 	"time"
@@ -28,7 +28,7 @@ func RegisterDashboardController(g *gin.RouterGroup) {
 // @ID /dashboard/panel_group_data
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=admin.PanelGroupDataOutput} "success"
+// @Success 200 {object} middleware.Response{data=dto.PanelGroupDataOutput} "success"
 // @Router /dashboard/panel_group_data [get]
 func (d *DashboardController) PanelGroupData(c *gin.Context) {
 	tx, err := lib.GetGormPool("default")
@@ -37,13 +37,13 @@ func (d *DashboardController) PanelGroupData(c *gin.Context) {
 		return
 	}
 	serviceInfo := &dao.ServiceInfo{}
-	_, serviceNum, err := serviceInfo.PageList(c, tx, &admin.ServiceListInput{PageSize: 1, PageNo: 1})
+	_, serviceNum, err := serviceInfo.PageList(c, tx, &dto.ServiceListInput{PageSize: 1, PageNo: 1})
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return
 	}
 	app := &dao.App{}
-	_, appNum, err := app.AppList(c, tx, &admin.AppListInput{PageNo: 1, PageSize: 1})
+	_, appNum, err := app.AppList(c, tx, &dto.AppListInput{PageNo: 1, PageSize: 1})
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
 		return
@@ -54,7 +54,7 @@ func (d *DashboardController) PanelGroupData(c *gin.Context) {
 		return
 	}
 
-	out := &admin.PanelGroupDataOutput{
+	out := &dto.PanelGroupDataOutput{
 		ServiceNum:      serviceNum,
 		AppNum:          appNum,
 		CurrentQPS:      counter.QPS,
@@ -70,7 +70,7 @@ func (d *DashboardController) PanelGroupData(c *gin.Context) {
 // @ID /dashboard/flow_stat
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=admin.ServiceStatOutput} "success"
+// @Success 200 {object} middleware.Response{data=dto.ServiceStatOutput} "success"
 // @Router /dashboard/flow_stat [get]
 func (d *DashboardController) FlowStat(c *gin.Context) {
 	//今日流量全天小时级访问统计
@@ -92,7 +92,7 @@ func (d *DashboardController) FlowStat(c *gin.Context) {
 		count, _ := counter.GetHourData(yesTime)
 		yesterdayList = append(yesterdayList, count)
 	}
-	middleware.ResponseSuccess(c, &admin.ServiceStatOutput{
+	middleware.ResponseSuccess(c, &dto.ServiceStatOutput{
 		Today:     todayList,
 		Yesterday: yesterdayList,
 	})
@@ -105,7 +105,7 @@ func (d *DashboardController) FlowStat(c *gin.Context) {
 // @ID /dashboard/service_stat
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} middleware.Response{data=admin.DashServiceStatOutput} "success"
+// @Success 200 {object} middleware.Response{data=dto.DashServiceStatOutput} "success"
 // @Router /dashboard/service_stat [get]
 func (d *DashboardController) ServiceStat(c *gin.Context) {
 	tx, err := lib.GetGormPool("default")
@@ -129,7 +129,7 @@ func (d *DashboardController) ServiceStat(c *gin.Context) {
 		list[index].Name = name
 		legend = append(legend, name)
 	}
-	out := &admin.DashServiceStatOutput{
+	out := &dto.DashServiceStatOutput{
 		Legend: legend,
 		Data:   list,
 	}

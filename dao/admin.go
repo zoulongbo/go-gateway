@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/public"
 	"time"
 )
@@ -32,7 +32,7 @@ func (t *Admin) Find(c *gin.Context, tx *gorm.DB, search *Admin) (*Admin, error)
 	return result, nil
 }
 
-func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *admin.LoginInput) (*Admin, error) {
+func (t *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.LoginInput) (*Admin, error) {
 	adminInfo, err := t.Find(c, tx, &Admin{Username: param.Username, IsDelete: 0})
 	if err != nil {
 		return nil, errors.New("用户不存在")

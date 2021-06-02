@@ -3,7 +3,7 @@ package dao
 import (
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/public"
 	"time"
 )
@@ -22,7 +22,7 @@ func (s *ServiceInfo) TableName() string {
 	return "gateway_service_info"
 }
 
-func (s *ServiceInfo) PageList(c *gin.Context, tx *gorm.DB, params *admin.ServiceListInput) ([]ServiceInfo, int64, error) {
+func (s *ServiceInfo) PageList(c *gin.Context, tx *gorm.DB, params *dto.ServiceListInput) ([]ServiceInfo, int64, error) {
 	total := int64(0)
 	var list []ServiceInfo
 	offset := (params.PageNo - 1) * params.PageSize
@@ -93,8 +93,8 @@ func (s *ServiceInfo) Save(c *gin.Context, tx *gorm.DB) error {
 	return nil
 }
 
-func (s *ServiceInfo) GroupByLoadType (c *gin.Context, tx *gorm.DB) ([]admin.DashServiceStatItemOutput, error)  {
-	var list []admin.DashServiceStatItemOutput
+func (s *ServiceInfo) GroupByLoadType (c *gin.Context, tx *gorm.DB) ([]dto.DashServiceStatItemOutput, error)  {
+	var list []dto.DashServiceStatItemOutput
 	query := tx.SetCtx(public.GetGinTraceContext(c))
 	if err := query.Table(s.TableName()).Where("is_delete=0").Select("load_type, count(*) as value").Group("load_type").Scan(&list).Error; err != nil {
 		return nil, err

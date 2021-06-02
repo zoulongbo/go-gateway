@@ -5,7 +5,7 @@ import (
 	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
 	"github.com/zoulongbo/go-gateway/dao"
-	"github.com/zoulongbo/go-gateway/dto/admin"
+	"github.com/zoulongbo/go-gateway/dto"
 	"github.com/zoulongbo/go-gateway/middleware"
 	"github.com/zoulongbo/go-gateway/public"
 	"time"
@@ -31,11 +31,11 @@ func RegisterAppController(g *gin.RouterGroup) {
 // @ID /app/app_add
 // @Accept  json
 // @Produce  json
-// @Param body body admin.AppAddInput true "body"
+// @Param body body dto.AppAddInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /app/app_add [post]
 func (app *AppController) AppAdd(c *gin.Context) {
-	params := &admin.AppAddInput{}
+	params := &dto.AppAddInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -76,11 +76,11 @@ func (app *AppController) AppAdd(c *gin.Context) {
 // @ID /app/app_update
 // @Accept  json
 // @Produce  json
-// @Param body body admin.AppUpdateInput true "body"
+// @Param body body dto.AppUpdateInput true "body"
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /app/app_update [post]
 func (app *AppController) AppUpdate(c *gin.Context) {
-	params := &admin.AppUpdateInput{}
+	params := &dto.AppUpdateInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -116,11 +116,11 @@ func (app *AppController) AppUpdate(c *gin.Context) {
 // @ID /app/app_detail
 // @Accept  json
 // @Produce  json
-// @Param id query admin.AppDetailInput true "租户id"
+// @Param id query dto.AppDetailInput true "租户id"
 // @Success 200 {object} middleware.Response{data=dao.App} "success"
 // @Router /app/app_detail [get]
 func (app *AppController) AppDetail(c *gin.Context) {
-	params := &admin.AppDetailInput{}
+	params := &dto.AppDetailInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -144,11 +144,11 @@ func (app *AppController) AppDetail(c *gin.Context) {
 // @ID /app/app_delete
 // @Accept  json
 // @Produce  json
-// @Param id query admin.AppDetailInput true "租户id"
+// @Param id query dto.AppDetailInput true "租户id"
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /app/app_delete [get]
 func (app *AppController) AppDelete(c *gin.Context) {
-	params := &admin.AppDetailInput{}
+	params := &dto.AppDetailInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -178,11 +178,11 @@ func (app *AppController) AppDelete(c *gin.Context) {
 // @ID /app/app_list
 // @Accept  json
 // @Produce  json
-// @Param info query admin.AppListInput true "body"
-// @Success 200 {object} middleware.Response{data=admin.AppListOutput} "success"
+// @Param info query dto.AppListInput true "body"
+// @Success 200 {object} middleware.Response{data=dto.AppListOutput} "success"
 // @Router /app/app_list [get]
 func (app *AppController) AppList(c *gin.Context) {
-	params := &admin.AppListInput{}
+	params := &dto.AppListInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -194,14 +194,14 @@ func (app *AppController) AppList(c *gin.Context) {
 		return
 	}
 
-	var outputList []admin.AppListItemOutput
+	var outputList []dto.AppListItemOutput
 	for _, item := range list {
 		if err != nil {
 			middleware.ResponseError(c, 2003, err)
 			c.Abort()
 			return
 		}
-		outputList = append(outputList, admin.AppListItemOutput{
+		outputList = append(outputList, dto.AppListItemOutput{
 			Id:       item.Id,
 			AppId:    item.AppId,
 			Name:     item.Name,
@@ -211,7 +211,7 @@ func (app *AppController) AppList(c *gin.Context) {
 			Qps:      item.Qps,
 		})
 	}
-	output := &admin.AppListOutput{
+	output := &dto.AppListOutput{
 		PageSize: params.PageSize,
 		PageNo:   params.PageNo,
 		List:     outputList,
@@ -228,11 +228,11 @@ func (app *AppController) AppList(c *gin.Context) {
 // @ID /app/app_stat
 // @Accept  json
 // @Produce  json
-// @Param id query admin.AppDetailInput true "租户id"
-// @Success 200 {object} middleware.Response{data=admin.AppStatOutput} "success"
+// @Param id query dto.AppDetailInput true "租户id"
+// @Success 200 {object} middleware.Response{data=dto.AppStatOutput} "success"
 // @Router /app/app_stat [get]
 func (app *AppController) AppStat(c *gin.Context) {
-	params := &admin.AppDetailInput{}
+	params := &dto.AppDetailInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
@@ -263,7 +263,7 @@ func (app *AppController) AppStat(c *gin.Context) {
 		count, _ := counter.GetHourData(yesTime)
 		yesterdayStat = append(yesterdayStat, count)
 	}
-	middleware.ResponseSuccess(c, &admin.AppStatOutput{
+	middleware.ResponseSuccess(c, &dto.AppStatOutput{
 		Today:     todayStat,
 		Yesterday: yesterdayStat,
 	})
