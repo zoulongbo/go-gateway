@@ -170,7 +170,6 @@ func (app *AppController) AppDelete(c *gin.Context) {
 	return
 }
 
-
 // AppList godoc
 // @Summary 租户列表
 // @Description 租户列表
@@ -201,6 +200,7 @@ func (app *AppController) AppList(c *gin.Context) {
 			c.Abort()
 			return
 		}
+		counter, _ := public.FlowCountHandler.GetFlowCounter(public.FlowAppPrefix + item.AppId)
 		outputList = append(outputList, dto.AppListItemOutput{
 			Id:       item.Id,
 			AppId:    item.AppId,
@@ -209,6 +209,8 @@ func (app *AppController) AppList(c *gin.Context) {
 			WhiteIPS: item.WhiteIPS,
 			Qpd:      item.Qpd,
 			Qps:      item.Qps,
+			RealQpd:  counter.QPS,
+			RealQps:  counter.TotalCount,
 		})
 	}
 	output := &dto.AppListOutput{
@@ -246,20 +248,20 @@ func (app *AppController) AppStat(c *gin.Context) {
 	}
 	//今日流量全天小时级访问统计
 	var todayStat, yesterdayStat []int64
-	counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowAppPrefix+detail.AppId)
+	counter, err := public.FlowCountHandler.GetFlowCounter(public.FlowAppPrefix + detail.AppId)
 	if err != nil {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
 	curr := time.Now()
 	for i := 0; i <= curr.Hour(); i++ {
-		currTime := time.Date(curr.Year(), curr.Month(), curr.Day(), i, 0, 0, 0 , lib.TimeLocation)
+		currTime := time.Date(curr.Year(), curr.Month(), curr.Day(), i, 0, 0, 0, lib.TimeLocation)
 		count, _ := counter.GetHourData(currTime)
 		todayStat = append(todayStat, count)
 	}
 	yes := curr.Add(-1 * 24 * time.Hour)
 	for i := 0; i <= 23; i++ {
-		yesTime := time.Date(yes.Year(), yes.Month(), yes.Day(), i, 0, 0, 0 , lib.TimeLocation)
+		yesTime := time.Date(yes.Year(), yes.Month(), yes.Day(), i, 0, 0, 0, lib.TimeLocation)
 		count, _ := counter.GetHourData(yesTime)
 		yesterdayStat = append(yesterdayStat, count)
 	}
